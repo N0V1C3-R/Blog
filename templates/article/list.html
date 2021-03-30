@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}
+	首页
+{% endblock title %}
+
+{% block content %}
+
+<div class="container">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item">
+				<a href="{% url 'article:article_list' %}?search={{ search }}">最新</a>
+			</li>
+			<li class="breadcrumb-item">
+				<a href="{% url 'article:article_list' %}?order=total_views&search={{ search }}">最热</a>
+			</li>
+		</ol>
+	</nav>
+	
+	<!-- 搜索栏 -->
+	<div class="row">
+		<div class="col-auto mr-auto">
+			<form class="form-inline">
+				<label class="sr-only">content</label>
+				<input class="form-control mb-2 mr-sm-2" type="text" name="search" placeholder="搜索文章..." required>
+			</form>
+		</div>
+	</div>
+
+	{% if search %}
+		{% if  articles %}
+			<h4>
+				<span style="color: skyblue">"{{ search }}"</span>的搜索结果如下：
+			</h4>
+		{% else %}
+			<h4>
+				暂无<span style="color: skyblue">"{{ search }}"</span>相关文章
+			</h4>
+		{% endif %}
+	{% endif %}
+
+	<div class="row mt-2">
+		{% for article in articles %}
+		<div class="col-4 mb-4">
+			<div class="card h-100">
+				<!-- 标题 -->
+				<h3 class="card-header">{{ article.title }}</h3>
+				<!-- 摘要 -->
+				<div class="card-body">
+					<p class="card-text">{{ article.body | slice:"66" }}...</p>
+				</div>
+				<!-- 注脚 -->
+				<div class=card-footer>
+					<a class="btn btn-primary" href="{% url 'article:article_detail' article.id %}">阅读本文</a>
+					<span>
+						<small style="color: #F9CDAD" class="col align-self-end">
+							浏览：{{ article.total_views }}
+						</small>
+					</span>
+				</div>
+			</div> 
+		</div>
+		{% endfor %}
+	</div>
+</div>
+
+<div class="paginator row">
+	<div class="m-auto">
+		<span class="step-links">
+			{% if articles.has_previous %}
+				<a class="btn btn-scuccess" href="?page=1&order={{ order }}&search={{ search }}">
+					&laquo; 1
+				</a>
+				<span>...</span>
+				<a class="btn btn-secondary" href="?page={{ articles.previous_page_number }}&order={{ order }}&search={{ search }}">
+					{{ articles.previous_page_number }}
+				</a>
+			{% endif %}
+			<span class="current btn btn-danger btn-lg">
+				{{ articles.number }}
+			</span>
+			{% if articles.has_next %}
+				<a class="btn btn-secondary" href="?page={{ articles.new_page_number }}&order={{ order }}&search={{ search }}">
+					{{ articles.next_page_number }}
+				</a>
+				<span>...</span>
+				<a class="btn btn-success" href="?page={{ articles.paginator.num_pages }}&order={{ order }}&search={{ search }}">
+					{{ articles.paginator.num_pages}} &raquo;		
+				</a>
+			{% endif %}
+		</span>
+	</div>
+</div>
+
+{% endblock content %}

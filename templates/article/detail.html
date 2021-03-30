@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    文章详情
+{% endblock title %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-9">
+            <h1 class="col-12 mt-4 mb-4">{{ article.title }}</h1>
+            <div class="col-12 alert alert-success">
+                <div class="col-12 alter alert-success">
+                    作者:{{ article.author }}
+                    {% if user == article.author %}
+                        ·<a href="#" onclick="confirm_safe_delete()">删除文章</a>
+                        ·<a href="{% url 'article:article_update' article.id %}">编辑文章</a>
+                    {% endif %}
+                </div>
+                <div>
+                    浏览：{{ article.total_views }}
+                </div>
+                <form method="POST" style="display: none;" action="{% url 'article:article_safe_delete' article.id %}" id="safe_delete">
+                    {% csrf_token %}
+                    <button type="submit">发送</button>
+                </form>
+                <script>
+                    fuction confirm_safe_delete() {
+                        layer.open({
+                            title: "确认删除",
+                            content: "确认删除本篇博文吗？",
+                            yes: fuction(index, layero) {
+                                $('form#safe_delete button').click();
+                                layer.close(index);
+                            }
+                        })
+                    }
+                </script>
+            </div>
+            <div class="col-12">
+                <p>{{ article.body | safe }}</p>
+            </div>
+            <!-- 发表评论 -->
+            <hr>
+            {% if user.is_authenticated %}
+                <div>
+                    <form method="POST" action="{% url 'comment:post_comment' article.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="body"><strong>我要评论：</strong></label>
+                            <textarea type="text" class="form-control" name="body" id="body" rows="2"></textarea>
+                        </div>
+                        <button class="btn btn-primary" type="submit">发送</button>
+                    </form>
+                </div>
+            {% else %}
+                <br>
+                <h5 class="row justify-content-center">请<a href="{% url 'userprofile:login' %}">登陆</a>后回复</h5>
+                <br>
+            {% endif %}
+
+            <!-- 显示评论 -->
+            <h4>共有{{ comments.count }}条评论</h4>
+            <div>
+                {% for comment in comments %}
+                    <hr>
+                    <p>
+                        <strong style="color: #337799">{{ comment.user }}</strong>于
+                        <span>{{ comment.created | date:"Y-m-d H:i:s" }}</span>评论：
+                    </p>
+                    <pre style="font-family: inherit; font-size: 1em;">{{ comment.body }}</pre>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-3 mt-4">
+            <h4><strong>目录</strong></h4>
+            <hr>
+            <div>
+                {{ toc|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

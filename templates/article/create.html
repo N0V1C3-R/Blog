@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    内容编辑
+{% endblock title %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <br>
+            <form method="POST" action=".">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="title">文章标题</label>
+                    <input type="text" class="form-control" id="title" name="title">
+                </div>
+                <div class="form-group">
+                    <label for="body">文章正文</label>
+                    <textarea type="text" class="form-control" name="body" id="body" rows="16"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">提交</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
